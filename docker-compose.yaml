@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  application:
+    container_name: "fastapi"
+    build:
+      context: $PWD
+      dockerfile: Dockerfile.yaml
+    env_file: .env
+    networks:
+          CTM:
+    ports:
+      - "8000:8000"
+    depends_on:
+        database:
+          condition: service_healthy
+  database:
+    container_name: "database"
+    image: "mysql"
+    env_file:
+      - .env
+    networks:
+      CTM:
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-u","root","-p$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+networks:
+  CTM:
